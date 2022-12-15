@@ -7,3 +7,4 @@ from django.contrib import admin
 
 admin.site.register(Items)
 admin.site.register(Userr)
+admin.site.register(Bids)

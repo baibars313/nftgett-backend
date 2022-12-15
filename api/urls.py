@@ -7,5 +7,10 @@ urlpatterns = [
 # #  api routs
 #  path('email/<int:first>/<int:last>/<str:key>/' ,emails, name='user' ),
  path('user/' ,Adduser, name='user' ),
+ path('itemids/' ,itemids, name='ids' ),
+ path('bid/' ,getBids, name='bids' ),
+ path('onsale/' ,allItemsbyaddress, name='onsale' ),
+ path('auctions/' ,allItemsauction, name='onsale' ),
+ path('license/' ,allItemslicense, name='onsale' ),
 ]
 # 0300454656

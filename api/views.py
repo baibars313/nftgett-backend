@@ -6,11 +6,11 @@ import requests
 from .models import *
 from .serializers import *
 from rest_framework.response import Response
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse,JsonResponse
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from django.core import serializers
 
 from PIL import Image    
 import requests
@@ -31,23 +31,7 @@ def user(request):
     return render(request, 'users.html')
 # baibars313Rajput
 
-@api_view(['GET','POST'])
-def Login(request,uid,key):
-    if request.method == 'GET':
-        if key=='baibars313Rajput':
-            try:
-                user=Userr.objects.get(number=uid)
-                # proxies=Proxies.objects.all()[first:last]
-                # pserializer = ProxySerializer(proxies, many=True)
-                # eserializer = EmailSerializer(emails, many=True)
-                
-            
-                return Response({'status':'ok',"username":user.usename,"password":user.passwd})
-            except:
-                return Response({'not':'registred'})
-        else:
-            return Response({"msg":"not allowed"})
-    
+  
 @api_view(['GET','POST'])
 def allItems(request):
     if request.method=="GET":
@@ -83,6 +67,24 @@ def allItemsbyaddress(request):
     else:
         return Response({"status":"no address proverder"})
 
+@api_view(['GET'])
+def allItemsauction(request):
+    if request.method=="GET":
+        allob=Items.objects.filter(auction=True)
+        serialized=Itemserializer(allob, many=True)
+        return Response(serialized.data)
+    else:
+        return Response({"status":"no address proverder"})
+
+@api_view(['GET'])
+def allItemslicense(request):
+    if request.method=="GET":
+        allob=Items.objects.filter(license=True)
+        serialized=Itemserializer(allob, many=True)
+        return Response(serialized.data)
+    else:
+        return Response({"status":"no address proverder"})
+
 
 @api_view(['GET','POST'])
 def Adduser(request):
@@ -104,6 +106,34 @@ def Adduser(request):
             if serializer.is_valid():
                 serializer.save()
                 return Response({"creaded":"ok"})
+
+
+@api_view(['GET'])
+def itemids(request):
+    if request.method=='GET':
+        cat=cat=request.GET.get("address")
+        ids=Items.objects.filter(owner=cat).values('tokenId','chain')
+       
+        ids=str(ids).split('t ')[1].removesuffix('>').strip().replace("'",'''"''').replace('\\','')
+        jsonid=json.loads(ids)
+        print(ids)
+        return Response({"ids":jsonid})
+
+@api_view(['GET','POST'])
+def getBids(request):
+    if request.method=='GET':
+        itemid=request.GET.get("itemid")
+        chainid=request.GET.get("chainId")
+        all_bids=Bids.objects.filter(itemId=itemid,chainId=chainid).order_by('-id')
+        serialized=Bidserializer(all_bids, many=True)
+        return Response(serialized.data)
+    if request.method=='POST':
+        serializer=Bidserializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"update":"ok"})
+
+        
 
 
 
